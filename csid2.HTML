@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>SACSD Driver Card Generator</title>
+
+https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.jsscript>
+https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.jsscript>
+https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.jsscript>
+
+<style>
+
+:root{
+--green:#00843D;
+--lightgreen:#84BD00;
+--blue:#00A3E0;
+--gray:#5F6369;
+}
+
+*{
+box-sizing:border-box;
+font-family:"Segoe UI",sans-serif;
+}
+
+body{
+margin:0;
+background:#f1f4f6;
+padding:20px;
+}
+
+.container{
+display:grid;
+grid-template-columns:350px 1fr;
+gap:20px;
+}
+
+.panel{
+background:#fff;
+padding:20px;
+border-radius:8px;
+box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+.panel h2{
+margin-top:0;
+color:var(--green);
+}
+
+.panel input{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+}
+
+button{
+background:var(--green);
+color:#fff;
+border:none;
+padding:10px 18px;
+margin-top:5px;
+margin-right:5px;
+cursor:pointer;
+border-radius:4px;
+}
+
+.preview{
+display:flex;
+flex-wrap:wrap;
+gap:20px;
+align-items:flex-start;
+}
+
+/* CR80 SCALE PREVIEW */
+
+.card-wrapper{
+transform:scale(.50);
+transform-origin:top left;
+height:300px;
+}
+
+/* CARD */
+
+.id-card{
+width:856px;
+height:540px;
+background:white;
+border-radius:22px;
+overflow:hidden;
+border:1px solid #ccc;
+position:relative;
+}
+
+.header{
+height:85px;
+background:var(--green);
+color:#fff;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 25px;
+}
+
+.header-title{
+font-size:30px;
+font-weight:700;
+}
+
+.header-sub{
+font-size:15px;
+letter-spacing:2px;
+}
+
+.logo{
+height:60px;
+}
+
+.green-bar{
+height:8px;
+background:var(--lightgreen);
+}
+
+.watermark{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%) rotate(-25deg);
+font-size:72px;
+font-weight:700;
+color:rgba(0,132,61,.05);
+white-space:nowrap;
+pointer-events:none;
+}
+
+.front-body{
+display:grid;
+grid-template-columns:250px 1fr;
+padding:20px;
+gap:20px;
+}
+
+.photo{
+width:220px;
+height:270px;
+border:2px solid #ddd;
+border-radius:10px;
+overflow:hidden;
+background:#fafafa;
+}
+
+.photo img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.signature{
+margin-top:12px;
+}
+
+.signature img{
+height:50px;
+max-width:180px;
+object-fit:contain;
+}
+
+.signature small{
+display:block;
+margin-bottom:5px;
+font-weight:600;
+}
+
+.details{
+font-size:21px;
+}
+
+.row{
+margin-bottom:10px;
+}
+
+.label{
+font-weight:700;
+color:#666;
+}
+
+.value{
+color:#111;
+}
+
+.footer{
+position:absolute;
+bottom:35px;
+left:20px;
+right:20px;
+display:flex;
+justify-content:space-between;
+align-items:flex-end;
+}
+
+#qrcode{
+width:95px;
+height:95px;
+}
+
+.card-number{
+font-size:22px;
+font-weight:700;
+color:var(--green);
+}
+
+.bottom-strip{
+position:absolute;
+bottom:0;
+left:0;
+right:0;
+padding:8px;
+background:var(--green);
+color:white;
+text-align:center;
+font-size:12px;
+letter-spacing:2px;
+}
+
+.back{
+padding:25px;
+}
+
+.back h3{
+color:var(--green);
+margin:0 0 10px;
+}
+
+.section{
+font-size:14px;
+line-height:1.55;
+margin-bottom:15px;
+}
+
+.ar{
+direction:rtl;
+text-align:right;
+font-family:Tahoma,sans-serif;
+}
+
+.meta{
+position:absolute;
+bottom:15px;
+left:25px;
+right:25px;
+display:flex;
+justify-content:space-between;
+font-size:13px;
+color:#444;
+}
+
+@media print{
+
+body{
+padding:0;
+background:white;
+}
+
+.panel{
+display:none;
+}
+
+.card-wrapper{
+transform:none;
+height:auto;
+page-break-after:always;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="panel">
+
+<h2>SACSD Driver Card</h2>
+
+<input id="driverName" placeholder="Driver Name">
+<input id="employeeId" placeholder="Employee ID">
+<input id="govId" placeholder="Government ID">
+<input id="company" placeholder="Contract Company">
+
+<input id="contractNo" placeholder="Contract Number">
+<input id="ucc" placeholder="Unit Cost Center (e.g. 783)">
+<input id="driverSerial" placeholder="Driver Serial (1,2,3...)">
+
+<input id="licenseNo" placeholder="License Number">
+
+<input id="issueDate" type="date">
+<input id="expiryDate" type="date">
+
+<label>Driver Photo</label>
+<input type="file" id="photoFile">
+
+<label>Approver Signature</label>
+<input type="file" id="signatureFile">
+
+<button onclick="generateCard()">Generate Card</button>
+
+<button onclick="downloadPDF()">Export PDF</button>
+
+<button onclick="window.print()">Print</button>
+
+</div>
+
+<div class="preview">
+
+<!-- FRONT -->
+
+<div class="card-wrapper">
+
+<div id="frontCard" class="id-card">
+
+<div class="watermark">
+COMMUNITY SERVICES
+</div>
+
+<div class="header">
+
+<div>
+<div class="header-title">COMMUNITY SERVICES</div>
+<div class="header-sub">CERTIFIED DRIVER</div>
+</div>
+
+aramco-logo.png
+
+</div>
+
+<div class="green-bar"></div>
+
+<div class="front-body">
+
+<div>
+
+<div class="photo">
+<img id="photoPreview">
+</div>
+
+<div class="signature">
+<small>Assessor / Approver</small>
+<img id="signaturePreview">
+</div>
+
+</div>
+
+<div class="details">
+
+<div class="row">
+<div class="label">Name</div>
+<div id="vName" class="value"></div>
+</div>
+
+<div class="row">
+<div class="label">Employee ID</div>
+<div id="vEmployee" class="value"></div>
+</div>
+
+<div class="row">
+<div class="label">Government ID</div>
+<div id="vGov" class="value"></div>
+</div>
+
+<div class="row">
+<div class="label">Contractor</div>
+<div id="vCompany" class="value"></div>
+</div>
+
+<div class="row">
+<div class="label">Driving License</div>
+<div id="vLicense" class="value"></div>
+</div>
+
+<div class="row">
+<div class="label">Issue Date</div>
+<div id="vIssue" class="value"></div>
+</div>
+
+<div class="row">
+<div class="label">Expiry Date</div>
+<div id="vExpiry" class="value"></div>
+</div>
+
+</div>
+
+</div>
+
+<div class="footer">
+
+<div id="qrcode"></div>
+
+<div>
+<div class="card-number" id="cardNumber">
+SACSD-00-000-0000-D00
+</div>
+</div>
+
+</div>
+
+<div class="bottom-strip">
+COMMUNITY SERVICES DRIVER CERTIFICATION
+</div>
+
+</div>
+</div>
+
+<!-- BACK -->
+
+<div class="card-wrapper">
+
+<div id="backCard" class="id-card back">
+
+<div class="watermark">
+SACSD
+</div>
+
+<h3>COMMUNITY SERVICES</h3>
+
+<div class="section">
+<b>Purpose and Qualification</b><br><br>
+
+CS Training and job certification verifies the card holder has met the required competency standard to drive in Saudi Aramco communities and the card is valid for activities designated by Community Services.
+</div>
+
+<div class="section ar">
+
+تتحقق شهادات التدريب واعتماد الوظائف في إدارة خدمات الحي السكني من أن حامل هذه البطاقة قد استوفى متطلبات الكفاءة اللازمة لقيادة المركبات داخل مجتمعات أرامكو السعودية، وأن البطاقة سارية للأنشطة المعتمدة من إدارة خدمات الحي السكني.
+
+</div>
+
+<hr>
+
+<div class="section">
+<b>Conditions of Use</b><br><br>
+
+This card valid only when accompanied by Saudi Aramco ID card or appropriate Government Identification which is mentioned on the front side of the card. Use of this card by anyone other than its owner, and or copying shall be considered forgery, and liable to penalty as prescribed by law.
+</div>
+
+<div class="section ar">
+
+لا تكون هذه البطاقة صالحة إلا عند إبراز بطاقة هوية أرامكو السعودية أو بطاقة هوية حكومية سارية المفعول مطابقة للبيانات المذكورة في الجهة الأمامية من البطاقة. ويعد استخدام هذه البطاقة من قبل أي شخص غير صاحبها أو استنساخها أو تزويرها مخالفة تستوجب المساءلة والعقوبات النظامية.
+
+</div>
+
+<div class="meta">
+
+<div>
+Issued By:<br>
+Community Services Department
+</div>
+
+<div>
+Card No:<br>
+<span id="backCardNo">-</span>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function generateCard() {
+
+const year =
+new Date().getFullYear().toString().slice(-2);
+
+const ucc =
+document.getElementById("ucc").value;
+
+const contract =
+document.getElementById("contractNo")
+.value.slice(-4);
+
+const serial =
+String(
+document.getElementById("driverSerial").value
+).padStart(2,"0");
+
+const sacsd =
+`SACSD-${year}-${ucc}-${contract}-D${serial}`;
+
+document.getElementById("cardNumber").innerText=sacsd;
+document.getElementById("backCardNo").innerText=sacsd;
+
+document.getElementById("vName").innerText =
+document.getElementById("driverName").value;
+
+document.getElementById("vEmployee").innerText =
+document.getElementById("employeeId").value;
+
+document.getElementById("vGov").innerText =
+document.getElementById("govId").value;
+
+document.getElementById("vCompany").innerText =
+document.getElementById("company").value;
+
+document.getElementById("vLicense").innerText =
+document.getElementById("licenseNo").value;
+
+document.getElementById("vIssue").innerText =
+document.getElementById("issueDate").value;
+
+document.getElementById("vExpiry").innerText =
+document.getElementById("expiryDate").value;
+
+const qrPayload = {
+card:sacsd,
+name:document.getElementById("driverName").value,
+employee:document.getElementById("employeeId").value,
+government:document.getElementById("govId").value,
+company:document.getElementById("company").value,
+license:document.getElementById("licenseNo").value,
+expiry:document.getElementById("expiryDate").value
+};
+
+document.getElementById("qrcode").innerHTML="";
+
+new QRCode(
+document.getElementById("qrcode"),
+{
+text:JSON.stringify(qrPayload),
+width:90,
+height:90
+}
+);
+
+}
+
+document.getElementById("photoFile")
+.addEventListener("change", function(e){
+
+const reader = new FileReader();
+
+reader.onload = function(){
+document.getElementById("photoPreview").src =
+reader.result;
+};
+
+reader.readAsDataURL(e.target.files[0]);
+
+});
+
+document.getElementById("signatureFile")
+.addEventListener("change", function(e){
+
+const reader = new FileReader();
+
+reader.onload = function(){
+document.getElementById("signaturePreview").src =
+reader.result;
+};
+
+reader.readAsDataURL(e.target.files[0]);
+
+});
+
+async function downloadPDF(){
+
+const { jsPDF } = window.jspdf;
+
+const pdf = new jsPDF(
+'landscape',
+'mm',
+'a4'
+);
+
+const front =
+await html2canvas(
+document.getElementById('frontCard'),
+{scale:3}
+);
+
+const back =
+await html2canvas(
+document.getElementById('backCard'),
+{scale:3}
+);
+
+pdf.addImage(
+front.toDataURL('image/png'),
+'PNG',
+10,
+25,
+85.6,
+53.98
+);
+
+pdf.addImage(
+back.toDataURL('image/png'),
+'PNG',
+115,
+25,
+85.6,
+53.98
+);
+
+pdf.save(
+document.getElementById("cardNumber").innerText + ".pdf"
+);
+
+}
+
+</script>
+
+</body>
+</html>
