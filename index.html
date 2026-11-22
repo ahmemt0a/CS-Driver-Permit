@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SACSD Driver Permit Generator</title>
+<title>CS Driver Permit Generator</title>
  
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -96,14 +96,14 @@ button.secondary:hover { background: #4a4d52; }
     
     <label>Driver Details</label>
     <input id="driverName" placeholder="Driver Name">
-    <input id="employeeId" placeholder="Employee ID">
+    <input id="employeeId" placeholder="Aramco ID">
     <input id="govId" placeholder="Government ID">
-    <input id="licenseNo" placeholder="License Number">
+    <input id="licenseEx" placeholder="License Expiry">
     
     <label>Contract Details</label>
     <input id="company" placeholder="Contract Company">
-    <input id="contractNo" placeholder="Contract Number (Last 4 Digits)" maxlength="4">
-    <input id="ucc" placeholder="Unit Cost Center (e.g. 783)">
+    <input id="contractNo" placeholder="Contract Number (Last 4 Digits)">
+    <input id="ucc" placeholder="Unit Cost Center (e.g. 785100)">
     <input id="driverSerial" placeholder="Driver Serial (1,2,3...)" type="number">
     
     <label>Validity</label>
@@ -153,10 +153,10 @@ button.secondary:hover { background: #4a4d52; }
           <!-- RIGHT COLUMN: Evenly Spaced Details -->
           <div class="details">
             <div class="row"><div class="label">Name</div><div id="vName" class="value"></div></div>
-            <div class="row"><div class="label">Employee ID</div><div id="vEmployee" class="value"></div></div>
+            <div class="row"><div class="label">Aramco ID</div><div id="vEmployee" class="value"></div></div>
             <div class="row"><div class="label">Government ID</div><div id="vGov" class="value"></div></div>
             <div class="row"><div class="label">Contractor</div><div id="vCompany" class="value"></div></div>
-            <div class="row"><div class="label">Driving License</div><div id="vLicense" class="value"></div></div>
+            <div class="row"><div class="label">License Expiry</div><div id="vLicenseEx" class="value"></div></div>
             <div class="row"><div class="label">Issue Date</div><div id="vIssue" class="value"></div></div>
             <div class="row"><div class="label">Expiry Date</div><div id="vExpiry" class="value"></div></div>
           </div>
@@ -170,7 +170,7 @@ button.secondary:hover { background: #4a4d52; }
           <div id="qrcode"></div>
         </div>
         
-        <div class="bottom-strip">COMMUNITY SERVICES DRIVER CERTIFICATION</div>
+        <div class="bottom-strip">SOUTHERN AREA COMMUNITY SERVICES DEPARTMENT</div>
       </div>
     </div>
  
@@ -195,7 +195,7 @@ button.secondary:hover { background: #4a4d52; }
           لا تكون هذه البطاقة صالحة إلا عند إبراز بطاقة هوية أرامكو السعودية أو بطاقة هوية حكومية سارية المفعول مطابقة للبيانات المذكورة في الجهة الأمامية من البطاقة. ويعد استخدام هذه البطاقة من قبل أي شخص غير صاحبها أو استنساخها أو تزويرها مخالفة تستوجب المساءلة والعقوبات النظامية.
         </div>
         <div class="meta">
-          <div>Issued By:<br>Community Services Department</div>
+          <div>Issued By:<br>SA Community Services Department</div>
           <div>Card No:<br><span id="backCardNo">-</span></div>
         </div>
       </div>
@@ -220,14 +220,14 @@ function generateCard() {
   document.getElementById("backCardNo").innerText = sacsd;
   
   document.getElementById("vName").innerText = document.getElementById("driverName").value;
-  document.getElementById("vEmployee").innerText = document.getElementById("employeeId").value;
+  document.getElementById("vAramco").innerText = document.getElementById("aramcoId").value;
   document.getElementById("vGov").innerText = document.getElementById("govId").value;
   document.getElementById("vCompany").innerText = document.getElementById("company").value;
-  document.getElementById("vLicense").innerText = document.getElementById("licenseNo").value;
+  document.getElementById("vLicenseEx").innerText = document.getElementById("licenseExpiry").value;
   document.getElementById("vIssue").innerText = document.getElementById("issueDate").value;
   document.getElementById("vExpiry").innerText = document.getElementById("expiryDate").value;
   
-  const qrPayload = `${sacsd}|${document.getElementById("driverName").value}|Emp:${document.getElementById("employeeId").value}|Gov:${document.getElementById("govId").value}|Lic:${document.getElementById("licenseNo").value}|Exp:${document.getElementById("expiryDate").value}`;
+  const qrPayload = `${sacsd}|${document.getElementById("driverName").value}|Emp:${document.getElementById("employeeId").value}|Gov:${document.getElementById("govId").value}|Lic:${document.getElementById("licenseEx").value}|Exp:${document.getElementById("expiryDate").value}`;
   
   document.getElementById("qrcode").innerHTML = "";
   new QRCode(document.getElementById("qrcode"), {
@@ -263,7 +263,7 @@ document.getElementById("signatureFile").addEventListener("change", function(e){
  
 async function downloadPDF(){
   const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF('landscape', 'mm', 'a4');
+  const pdf = new jsPDF('landscape', 'mm', 'usletter');
   
   const front = await html2canvas(document.getElementById('frontCard'), {scale:3, useCORS: true});
   const back = await html2canvas(document.getElementById('backCard'), {scale:3, useCORS: true});
