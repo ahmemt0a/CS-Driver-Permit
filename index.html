@@ -208,12 +208,12 @@ function generateCard() {
   const year = new Date().getFullYear().toString().slice(-2);
   const uccRaw = document.getElementById("ucc").value || "000";
   const ucc = uccRaw.slice(-3).padStart(3, "0");
- 
+
   const contractRaw = document.getElementById("contractNo").value || "0000";
   const contract = contractRaw.slice(-4).padStart(4, "0");
   
   const serialRaw = document.getElementById("driverSerial").value || "0";
-  const serial = String(serialRaw).padStart(2,"0");
+  const serial = String(serialRaw).padStart(2, "0");
   
   const sacsd = `SACSD-${year}-${ucc}-${contract}-D${serial}`;
   
@@ -221,14 +221,14 @@ function generateCard() {
   document.getElementById("backCardNo").innerText = sacsd;
   
   document.getElementById("vName").innerText = document.getElementById("driverName").value;
-  document.getElementById("vAramco").innerText = document.getElementById("aramcoId").value;
+  document.getElementById("vAramco").innerText = document.getElementById("employeeId").value; // Fixed ID
   document.getElementById("vGov").innerText = document.getElementById("govId").value;
   document.getElementById("vCompany").innerText = document.getElementById("company").value;
-  document.getElementById("vLicenseEx").innerText = document.getElementById("licenseExpiry").value;
+  document.getElementById("vLicenseEx").innerText = document.getElementById("licenseEx").value; // Fixed ID
   document.getElementById("vIssue").innerText = document.getElementById("issueDate").value;
   document.getElementById("vExpiry").innerText = document.getElementById("expiryDate").value;
   
-  const qrPayload = `${sacsd}|${document.getElementById("driverName").value}|Emp:${document.getElementById("employeeId").value}|Gov:${document.getElementById("govId").value}|Lic:${document.getElementById("licenseEx").value}|Exp:${document.getElementById("expiryDate").value}`;
+  const qrPayload = `${sacsd}|${document.getElementById("driverName").value}|AramcoID:${document.getElementById("employeeId").value}|Gov:${document.getElementById("govId").value}|LicExp:${document.getElementById("licenseEx").value}|Exp:${document.getElementById("expiryDate").value}`;
   
   document.getElementById("qrcode").innerHTML = "";
   new QRCode(document.getElementById("qrcode"), {
