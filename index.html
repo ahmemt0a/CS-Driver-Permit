@@ -49,7 +49,7 @@ button.secondary:hover { background: #4a4d52; }
 .header-sub{ font-size:15px; letter-spacing:2px; }
 .logo{ height:50px; object-fit: contain;}
  
-.accent-bar{ height:8px; background:var(--yellow); }
+.accent-bar{ height:10px; background:var(--yellow); }
  
 .watermark{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-25deg); font-size:72px; font-weight:700; color:rgba(0,51,160,.05); white-space:nowrap; pointer-events:none; }
  
@@ -59,7 +59,7 @@ button.secondary:hover { background: #4a4d52; }
 .photo img{ width:100%; height:100%; object-fit:cover; display: none;}
  
 .signature{ margin-top:12px; text-align: center; width: 220px; }
-.signature img{ height:50px; max-width:180px; object-fit:contain; display: none; margin: 0 auto;}
+.signature img{ height:60px; max-width:180px; object-fit:contain; display: none; margin: 0 auto;}
 .signature small{ display:block; margin-bottom:2px; font-weight:600; color: #555; }
  
 /* Aligned details to stretch and cover the gap evenly */
@@ -72,7 +72,7 @@ button.secondary:hover { background: #4a4d52; }
 #qrcode{ width:95px; height:95px; }
 .card-number{ font-size:22px; font-weight:700; color:var(--darkblue); }
  
-.bottom-strip{ position:absolute; bottom:0; left:0; right:0; padding:8px; background:var(--darkblue); color:white; text-align:center; font-size:12px; letter-spacing:2px; }
+.bottom-strip{ position:absolute; bottom:0; left:0; right:0; padding:10px; background:var(--darkblue); color:white; text-align:center; font-size:12px; letter-spacing:2px; }
  
 .back{ padding:25px; }
 .back h3{ color:var(--darkblue); margin:0 0 10px; }
@@ -103,7 +103,7 @@ button.secondary:hover { background: #4a4d52; }
     <label>Contract Details</label>
     <input id="company" placeholder="Contract Company">
     <input id="contractNo" placeholder="Contract Number (Last 4 Digits)">
-    <input id="ucc" placeholder="Unit Cost Center (e.g. 785100)">
+    <input id="ucc" placeholder="Unit Cost Center (last 3 Digits)">
     <input id="driverSerial" placeholder="Driver Serial (1,2,3...)" type="number">
     
     <label>Validity</label>
@@ -127,7 +127,7 @@ button.secondary:hover { background: #4a4d52; }
     <!-- FRONT -->
     <div class="card-wrapper">
       <div id="frontCard" class="id-card">
-        <div class="watermark">COMMUNITY SERVICES</div>
+        <div class="watermark">SA COMMUNITY SERVICE DEPT</div>
         <div class="header">
           <div>
             <div class="header-title">COMMUNITY SERVICES</div>
@@ -153,7 +153,7 @@ button.secondary:hover { background: #4a4d52; }
           <!-- RIGHT COLUMN: Evenly Spaced Details -->
           <div class="details">
             <div class="row"><div class="label">Name</div><div id="vName" class="value"></div></div>
-            <div class="row"><div class="label">Aramco ID</div><div id="vEmployee" class="value"></div></div>
+            <div class="row"><div class="label">Aramco ID</div><div id="vAramco" class="value"></div></div>
             <div class="row"><div class="label">Government ID</div><div id="vGov" class="value"></div></div>
             <div class="row"><div class="label">Contractor</div><div id="vCompany" class="value"></div></div>
             <div class="row"><div class="label">License Expiry</div><div id="vLicenseEx" class="value"></div></div>
@@ -206,8 +206,9 @@ button.secondary:hover { background: #4a4d52; }
 <script>
 function generateCard() {
   const year = new Date().getFullYear().toString().slice(-2);
-  const ucc = document.getElementById("ucc").value || "000";
-  
+  const uccRaw = document.getElementById("ucc").value || "000";
+  const ucc = uccRaw.slice(-3).padStart(3, "0");
+ 
   const contractRaw = document.getElementById("contractNo").value || "0000";
   const contract = contractRaw.slice(-4).padStart(4, "0");
   
